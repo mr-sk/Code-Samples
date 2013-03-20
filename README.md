@@ -11,6 +11,9 @@ In addition, if you came to this URL directly, don't forget to navigate and view
 
 Assorted Code Samples (2007 - Present)
 
+* Log Cleaner (2012, Python)
+  A wtmp, utmp and lastlog log cleaner. Read more: https://github.com/mr-sk/pyLogCleaner
+
 * LogController.h/m (2010, Objective-C)
   OSX Client application that reads from a REST API, consumes and renders XML.
 
