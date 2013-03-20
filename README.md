@@ -1,6 +1,11 @@
 Code-Samples
 ============
 
+Unfortunately I cannot share many code samples, as they belong to my employer. However, if you are interested in interviewing me, I can speak about all sorts of projects I've worked
+on that are not reflected in the samples here. I can also bring along personal projects that are private and share source with you in a meeting. 
+
+I will update this overtime, so 'watch' it for updates. 
+
 Assorted Code Samples (2007 - Present)
 
 * careerDay2010 (2010; PHP, HTML, Javascript, SQL)
