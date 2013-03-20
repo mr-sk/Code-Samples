@@ -6,6 +6,9 @@ on that are not reflected in the samples here. I can also bring along personal p
 
 I will update this overtime, so 'watch' it for updates. 
 
+In addition, if you came to this URL directly, don't forget to navigate and view a list of all my repositories: https://github.com/mr-sk?tab=repositories
+
+
 Assorted Code Samples (2007 - Present)
 
 * LogController.h/m (2010, Objective-C)
