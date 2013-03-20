@@ -1,0 +1,104 @@
+<?php
+/**
+ * @copyright Copyright (c) 2010 Elephant Ventures, LLC.
+ * @author Matt Grippo <matt@elephantventures.com>
+ * 		   Ben Sgro <ben@elephantventures.com>
+ */
+define('CD_PATH',      '/campaigns/careerDay2010/');
+define('CAREER_PATH',  'Career/');
+define('REP_PATH',     ROOT . CD_PATH . 'representations/');
+
+include_once(ROOT . '/global.inc');
+include_once(ROOT . '/home/home_func.inc');
+include_once(ROOT . CD_PATH . 'careerDayXML.class.inc');
+include_once(ROOT . CD_PATH . 'careerDaySPI.class.inc');
+include_once(ROOT . CD_PATH . 'TransformXML.class.inc');
+include_once(ROOT . CD_PATH . 'defines.inc');
+include_once(ROOT . CD_PATH . CAREER_PATH . 'career.class.inc');
+
+global $flash_action;
+global $arrData;
+global $hookVars;
+global $shirtType; 
+
+function handleStudio($jobId)
+{
+    _trace('handleStudio for jobId:' . $jobId);
+    $careerString = career::mapCareerIdToClass($jobId);
+    include_once(ROOT . CD_PATH . CAREER_PATH . $careerString . '.class.inc');
+    include_once(ROOT . CD_PATH . 'StateMachine/stateMachine.class.inc');
+
+    $career = new $careerString;
+    if ($career->isActiveForUser())
+    {
+        $career->updateStatusForLoggedInUser();
+        if (!$career->isTaskActiveForUser()) return FALSE;
+		
+        $career->_stateMachine->update($career);
+    }	
+}
+
+// check that the process shirt action is a purchase (and not a move, wear, etc)
+if ($flash_action == 'purchase') {
+	
+	// figure out the main properties of the shirt we care about by interogating the $arrData property 
+	// this references id's in ugc_feature and ugc_element that can be found in the database
+	
+	$hasSleves = false;
+	$hasButtons = false;
+	$hasLongSleves = false;
+	$hasShortSleves = false;
+	$hasRoundCollar = false;
+	$hasFlapCollar = false;
+	$hasDesign = false;
+	foreach ($arrData as $elem) {
+		if ($elem[FEATURE_ID] == '3C10AE8D-A35B-33FC-E040-007F01005DD9') $hasSleves = true;
+		if ($elem[FEATURE_ID] == '3C10AE8D-A35E-33FC-E040-007F01005DD9') $hasButtons = true;
+		if (	$elem[ELEMENT_ID] == '3C10AE8D-A366-33FC-E040-007F01005DD9' 
+			|| 	$elem[ELEMENT_ID] == '4404C431-3F47-DFD6-E040-640A1A393EA7') $hasLongSleves = true;
+		if (	$elem[ELEMENT_ID] == '3C10AE8D-A365-33FC-E040-007F01005DD9' 
+			|| 	$elem[ELEMENT_ID] == '4404C431-3F46-DFD6-E040-640A1A393EA7') $hasShortSleves = true;
+		if ($elem[ELEMENT_ID] == '3C10AE8D-A36D-33FC-E040-007F01005DD9') $hasFlapCollar = true;
+		if ($elem[ELEMENT_ID] == '3C10AE8D-A36E-33FC-E040-007F01005DD9') $hasRoundCollar = true;
+		if (	$elem[FEATURE_ID] == '3C10AE8D-A35F-33FC-E040-007F01005DD9'
+			||	$elem[FEATURE_ID] == '3C10AE8D-A360-33FC-E040-007F01005DD9'
+			||	$elem[FEATURE_ID] == '3C10AE8D-A361-33FC-E040-007F01005DD9'
+			|| 	$elem[FEATURE_ID] == '3C10AE8D-A364-33FC-E040-007F01005DD9') $hasDesign = true;
+	}
+	
+	// debug clothing features 
+	/* 
+	error_log(sprintf(	'hasSleves:%s hasButtons:%s hasLongSleves:%s hasShortSleves:%s hasRoundCollar:%s hasFlapCollar:%s hasDesign:%s',
+							$hasSleves,
+							$hasButtons,
+							$hasLongSleves,
+							$hasShortSleves,
+							$hasRoundCollar,
+							$hasFlapCollar,
+							$hasDesign));
+	*/
+	
+	// three different types of shirts that career day cares about can be decided from the above properties
+	if (!$hasSleves) {
+		// is tank top
+		$shirtType = SHIRT_TANK_TOP;
+		handleStudio(ID_DESIGNER);
+	} else if ($hasShortSleves && $hasRoundCollar && $hasDesign) {
+		// is designer t shirt
+		$shirtType = SHIRT_DESIGNER;
+		handleStudio(ID_DESIGNER);		
+	} else if ($hasLongSleves && $hasFlapCollar && $hasButtons) {
+		// is button down
+		$shirtType = SHIRT_BUTTON_DOWN;
+		handleStudio(ID_DESIGNER);		
+	}
+	
+	
+	// this is an example of how to trigger the overlay inside the poster factory
+	// $hookVars .= '&extensionMovieClip=' . urlencode(IMAGE_HOST . '/campaigns/careerDay2010/test3-tfactory.swf?xml=' . urlencode('<root/>'));	
+	
+}
+
+
+
+

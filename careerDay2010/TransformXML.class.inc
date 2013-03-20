@@ -1,0 +1,238 @@
+<?php
+/**
+ * @author Ben Sgro
+ */
+define('XML_JOBS_LIST',    file_get_contents(REP_PATH . 'jobsList.xml'));
+define('XML_JOB_LIST',     file_get_contents(REP_PATH . 'jobList.xml'));
+define('XML_JOB_ITEM',     file_get_contents(REP_PATH . 'job.xml'));
+define('XML_TASKS_LIST',   file_get_contents(REP_PATH . 'tasksList.xml'));
+define('XML_TASK_ITEM',    file_get_contents(REP_PATH . 'task.xml'));
+define('XML_TASK_COMPLETE',file_get_contents(REP_PATH . 'completeTask.xml'));
+define('XML_ERROR',        file_get_contents(REP_PATH . 'error.xml'));
+
+/**
+ * @package TransformXML
+ */
+class TransformXML
+{
+    /**
+     * @param   object  $career A career instance.
+     *
+     * @return  string  An xml representation of the completed task.
+     */
+    function completeTaskXML($career)
+    {
+        // Subtract one from the current state, because we've already advanced
+        // to the next state upon completing the task - but we want to show the
+        // data of the previous task aka the one they JUST completed.
+        $taskCount = TransformXML::lcfirst(career::mapIntegerToTaskString($career->_stateMachine->getStateAsInteger()-1));        
+        $tDescription = sprintf('_%sMessage',    $taskCount);
+        $tCheck       = sprintf('_%sAwardCheck', $taskCount);
+        $tSWF         = sprintf('_%sGameWinSwf', $taskCount);
+        $tItemId      = sprintf('_%sAwardItemId',$taskCount);
+        $tLocation    = sprintf('_%sTargetType', $taskCount);
+
+        // Extract the item data from the database.
+        $sql     = sprintf("select * from master_items where item_id = %s", $career->$tItemId);
+        $row     = db_fetch_object(db_query($sql));
+        $itemXML = item_image_xml($row, '', "_self", false, 80, 80, $career->$tItemId);
+        $loadXml = urldecode($itemXML);
+
+        $tmpStr = sprintf(XML_TASK_COMPLETE,
+                           ($career->$tLocation == 'game')? '1' : '0', // We have to specify if this is a game or not
+                           date('n/d/Y'),
+                           USERNAME,
+                           $career->$tCheck,
+                           $row->item_name,
+                           $loadXml);
+        return $tmpStr;
+    }   
+    
+    /**
+     * @param   object  $jobItem    A career object.
+     *
+     * @return  string              A string representation of the job item and task collection.
+     */
+    function jobListToXml($jobItem)
+    {
+        $taskList = '';
+        for($x=0; $x<3; ++$x) // We only support 3x tasks per Career
+        {
+            $taskCount = TransformXML::lcfirst(career::mapIntegerToTaskString($x));
+            $tAwardTitle    = sprintf('_%sAwardTitle',    $taskCount);
+            $tComplete      = sprintf('_%sComplete',      $taskCount);
+            $tDescription   = sprintf('_%sDescription',   $taskCount);
+            $tMB            = sprintf('_%sAwardCheck',    $taskCount);
+            $tItem          = sprintf('_%sAwardItem',     $taskCount);
+            $tItemId        = sprintf('_%sAwardItemId',   $taskCount);
+            $tType          = sprintf('_%sTargetType',    $taskCount);
+            $tURL           = sprintf('_%sTargetURL',     $taskCount);
+            $tGame          = sprintf('_%sGameId',        $taskCount);
+            $tStatusMessage = sprintf('_%sStatusMessage', $taskCount);
+            $tRollOverMsg   = sprintf('_%sRollOverCompletion', $taskCount);
+                        
+            // Extract the item data from the database.
+            $sql     = sprintf("select * from master_items where item_id = %s", $jobItem->$tItemId);
+            $row     = db_fetch_object(db_query($sql));
+            
+            $taskList .= sprintf(XML_TASK_ITEM,
+                                 $x, // task id
+                                 $jobItem->$tAwardTitle,
+                                 $jobItem->$tComplete,
+                                 $jobItem->$tDescription,
+                                 $row->item_name,
+                                 $row->item_name,//$jobItem->$tItem,
+                                 $jobItem->$tMB,
+                                 $jobItem->$tType,
+                                 $jobItem->$tURL,
+                                 $jobItem->$tGame,
+                                 $jobItem->$tStatusMessage,
+                                 $jobItem->$tRollOverMsg);
+        }
+
+        // If we haven't completed any tasks, then there is nothing to show in the title/award
+        // xml - so we skip setting it. Otherwise, we take the current state, subtract one to
+        // get the last COMPLETED state and extract the awardTitle and awardItem.
+        $taskTitle = '';
+        $awardItem = '';
+        $taskCount = $jobItem->_stateMachine->getStateAsInteger();
+        if ($taskCount > 0)
+        {
+            $taskCount = $taskCount - 1;
+
+            $taskCount = TransformXML::lcfirst(career::mapIntegerToTaskString($taskCount));
+            $taskTitle = sprintf('_%sAwardTitle', $taskCount);
+            $awardItem = sprintf('_%sAwardItem',  $taskCount);
+            
+            $taskTitle = $jobItem->$taskTitle;
+            $awardItem = $jobItem->$awardItem;
+        }
+        
+        $canBeStarted   = 0;
+        $canBeFinished  = 0;
+        $taskValidToday = 1;
+
+        // If the job hasn't been started AND the user hasn't started any other jobs today.
+        if ( (!$jobItem->_taskStartTime) && (!$jobItem->isActiveForUser()) && (!$jobItem->hasAlreadyStartedAJobToday()))
+        {
+            $canBeStarted = 1;
+        }
+        
+        // If task one and two are complete AND the user hasn't finished a job today
+        if ( ($jobItem->_taskOneComplete) && ($jobItem->_taskTwoComplete) && (!$jobItem->hasAlreadyCompletedAJobToday()) )
+        {
+            $canBeFinished = 1;        
+        }
+        
+        $xml = sprintf(XML_JOB_ITEM,
+                        $jobItem->_id,
+                        $jobItem->_title,
+                        $jobItem->_available,
+                        $canBeStarted,
+                        $canBeFinished,
+                        $taskValidToday,
+                        (int) $jobItem->isActiveForUser(),
+                        $jobItem->_image,
+                        $jobItem->_description,
+                        $jobItem->_stateMachine->getStateAsInteger(),
+                        $taskTitle,
+                        $awardItem,
+                        sprintf(XML_TASKS_LIST, $taskList));
+        
+        return sprintf(XML_JOBS_LIST, USERNAME, $xml);
+    }
+    
+    /**
+     * Generates an XML list of all the jobs.
+     *
+     * @param   array   $jobSet An array of jobs
+     *
+     * @return  string          An XML representation of jobs
+     */
+    function jobsListToXML($jobSet)
+    {
+        $xml = '';
+        foreach($jobSet as $jobItem)
+        {
+            $awardItem      = '';
+            $hasBeenStarted = ($jobItem->isActiveForUser())? 1 : 0;            
+            $taskTitle = (3 == $jobItem->_stateMachine->getStateAsInteger())? $jobItem->_taskThreeAwardTitle : '';
+            if (3 == $jobItem->_stateMachine->getStateAsInteger())
+            {
+                $sql     = sprintf("select * from master_items where item_id = %s", $jobItem->_taskThreeAwardItemId);
+                $row     = db_fetch_object(db_query($sql));  
+                $awardItem = $row->item_name;
+            }
+
+            $xml .= sprintf(XML_JOB_ITEM,
+                            $jobItem->_id,
+                            $jobItem->_title,
+                            $jobItem->_available,
+                            '', // 'canbestarted' not used
+                            '', // 'canbefinished' not used
+                            '', // 'taskvalidtoday' not used
+                            $hasBeenStarted,
+                            $jobItem->_image,
+                            $jobItem->_description,
+                            $jobItem->_stateMachine->getStateAsInteger(),
+                            $taskTitle,
+                            $awardItem,
+                            ''); // Not used in this instance, but used to provide the task list in others.
+        }
+        
+        return sprintf(XML_JOBS_LIST,
+                       USERNAME,
+                       $xml);
+    }
+
+    /**
+     * Maps the response code a standard error XML.
+     *
+     * @param   int $res    A result code.
+     *
+     * @return  string      An XML representation of the error.
+     */
+    function codeResultToXML($res)
+    {
+        return @ sprintf(XML_ERROR, $res, TransformXML::toString($res), _getTraceForLog());
+    }
+    
+    /**
+     * Maps the provide response code $res to a string.
+     *
+     * @param   int $res    A resonse code, typically < 0
+     * 
+     * @return  string      A string message.
+     */
+    function toString($res)
+    {
+        switch($res)
+        {
+            case ERROR_INVALID_JOB_ID:  return 'The job_id is invalid';                 break;
+            case ERROR_TASK_STARTED:    return 'The task has been started';             break;
+            case ERROR_TASK_TIME:       return 'Only one task can be started per day';  break;
+            case ERROR_INVALID_BOOK_ID: return 'The book_id is invalid';                break;
+            case ERROR_MIXED:           return 'Inactive career or task limit reached'; break;
+            case ERROR_JOB_STARTED:     return 'Only one job can be started per day';   break;
+            case ERROR_UNABLE_TO_RESET: return 'Failed to reset job';                   break;
+            case ERROR_INVALID_TASK_ID: return 'The task_id is invalid';                break;
+            default:                    return "Unknown error, response code ($res)";
+        }
+    }
+    
+    /**
+     * Some real ghetto madness. PHP 4.x doesn't support lcfirst, so we provide
+     * our own implementation of the method here. Basically, take the value
+     * convert to decimal add 32 and convert back to character.
+     *
+     * In case you care, A=65 a=97 difference=32, so we can c+=32 to get the
+     * lower case character.
+     */
+    function lcfirst($str)
+    {
+        $c  = ord($str[0]);
+        $c += 32;
+        $str[0] = chr($c);  
+        return $str;
+    }
+}

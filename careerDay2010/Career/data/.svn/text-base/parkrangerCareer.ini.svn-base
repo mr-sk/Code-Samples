@@ -1,0 +1,72 @@
+; @copyright Copyright (c) 2010 Elephant Ventures, LLC.
+; @author Ben Sgro <ben@elephantventures.com
+
+; Used to turn the career on/off
+_available  = 1
+    
+_id          = 4
+_image       = "parkranger.swf"
+_title       = "Park Ranger"
+_description = "Imagine spending the day in a beautiful park as your job?! Park rangers do just that. They work to preserve and protect the park's natural beauty, give tours to visitors, and educate them on park history."
+
+_taskOne   =
+_taskTwo   =
+_taskThree = 
+
+_taskOneMessage   = "Completed task one!"
+_taskTwoMessage   = "Completed task two!"
+_taskThreeMessage = "Completed task three!"
+    
+_taskOneDescription   = "Keep Millsberry beautiful: Earn 150 points during any one game of Peabody Park Cleanup and then submit your score."
+_taskTwoDescription   = "Buy and read 'The History of Earth Day Book'."
+_taskThreeDescription = "Submit a score of at least 250 points from any one game of Peabody Park Cleanup."
+
+_taskOneAwardItemId   = 18536
+_taskTwoAwardItemId   = 18537
+_taskThreeAwardItemId = 18538
+
+_taskOneAwardItem   = "item1.swf"
+_taskTwoAwardItem   = "item2.swf"
+_taskThreeAwardItem = "item3.swf"
+
+_taskOneAwardCheck   = 100
+_taskTwoAwardCheck   = 200
+_taskThreeAwardCheck = 300
+
+_taskOneAwardTitle   = "Park Ranger"
+_taskTwoAwardTitle   = "Senior Park Ranger"
+_taskThreeAwardTitle = "Park Ranger Director"
+
+_taskCompleteMessage = "Great Job"  
+
+_taskOneGameId = 19
+_taskTwoGameId = 
+_taskThreeGameId = 19
+
+_taskOneTargetType   = "game"
+_taskTwoTargetType   = "location"
+_taskThreeTargetType = "game"
+
+_taskOneTargetURL   = ""
+_taskTwoTargetURL   = "/shop.phtml?shop_id=2"
+_taskThreeTargetURL = ""
+
+_taskOneGameScore   = 150
+_taskTwoGameScore   =       ;Reading a book ...
+_taskThreeGameScore = 250
+
+_taskOneGameWinSwf   = "/campaigns/careerDay2010/careerDay2010.swf"
+_taskTwoGameWinSwf   = "/campaigns/careerDay2010/careerDay2010.swf"
+_taskThreeGameWinSwf = "/campaigns/careerDay2010/careerDay2010.swf"
+
+_taskOneGameLoseSwf   = "/campaigns/careerDay2010/careerDay2010.swf"
+_taskTwoGameLoseSwf   = "/campaigns/careerDay2010/careerDay2010.swf"
+_taskThreeGameLoseSwf = "/campaigns/careerDay2010/careerDay2010.swf"
+
+_taskOneStatusMessage = "You want to be a Park Ranger."
+_taskTwoStatusMessage = "You're currently a Park Ranger. Keep on working!"
+_taskThreeStatusMessage = "You're currently a Senior Park Ranger. Keep it up!"
+
+_taskOneRollOverCompletion = "Great job, Park Ranger! You finished the project and earned your Park Ranger hat."
+_taskTwoRollOverCompletion = "Great job, Senior Park Ranger! You finished the project and earned your state park mural."
+_taskThreeRollOverCompletion = ""

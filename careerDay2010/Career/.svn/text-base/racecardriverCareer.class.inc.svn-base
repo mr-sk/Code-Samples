@@ -1,0 +1,23 @@
+<?php
+/**
+ * @copyright Copyright (c) 2010 Elephant Ventures, LLC.
+ * @author  Ben Sgro <ben@elephantventures.com>
+ */
+
+include_once('career.class.inc');
+
+/**
+ * @package racecardriverCareer
+ */
+class racecardriverCareer extends career
+{
+    function racecardriverCareer()
+    {
+        parent::career(get_class($this));
+    }
+    
+    function updateStatusForLoggedInUser()
+    {
+        parent::updateStatusForLoggedInUser();
+    }
+}

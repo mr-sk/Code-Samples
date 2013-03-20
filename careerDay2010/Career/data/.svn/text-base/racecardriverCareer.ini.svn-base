@@ -1,0 +1,72 @@
+; @copyright Copyright (c) 2010 Elephant Ventures, LLC.
+; @author Ben Sgro <ben@elephantventures.com
+
+; Used to turn the career on/off
+_available  = 1
+
+_id          = 9
+_image       = "racecardriver.swf"
+_title       = "Racecar Driver"
+_description = "Racecar drivers not only love the sound of a roaring engine, they know a lot about cars, safety, and the history of racing. Successful drivers can compete all over the world!"
+
+_taskOne   =
+_taskTwo   =
+_taskThree = 
+
+_taskOneMessage   = "Completed task one!"
+_taskTwoMessage   = "Completed task two!"
+_taskThreeMessage = "Completed task three!"
+    
+_taskOneDescription   = "Racecar drivers need to be safe! Buy a cheerios firesuit and put it on your buddy."
+_taskTwoDescription   = "Score 750 points during any one game of The Millsberry 500, and then submit your score to get your Millscheck...plus a cool new item!"
+_taskThreeDescription = "Score at least 1000 points during any one game of The Millsberry 500, and then submit your score to get your Millscheck, plus an item!"
+
+_taskOneAwardItemId   = 18554
+_taskTwoAwardItemId   = 18555
+_taskThreeAwardItemId = 18556
+        
+_taskOneAwardItem   = "item1.swf"
+_taskTwoAwardItem   = "item2.swf"
+_taskThreeAwardItem = "item3.swf"
+
+_taskOneAwardCheck   = 100
+_taskTwoAwardCheck   = 200
+_taskThreeAwardCheck = 300
+
+_taskOneAwardTitle   = "Short-Track Driver"
+_taskTwoAwardTitle   = "Formula Three Racer"
+_taskThreeAwardTitle = "Formula One Racer"
+
+_taskCompleteMessage = "Great Job!"  
+
+_taskOneGameId   = 
+_taskTwoGameId   = 510
+_taskThreeGameId = 510
+
+_taskOneTargetType   = "location"
+_taskTwoTargetType   = "game"
+_taskThreeTargetType = "game"
+
+_taskOneTargetURL   = "/shop.phtml?shop_id=7"
+_taskTwoTargetURL   = ""
+_taskThreeTargetURL = ""
+
+_taskOneGameScore   =    ;TODO: change to 200, set to 2 for debuggin
+_taskTwoGameScore   = 750   ;TODO: change to 300, set to 3 for debuggin
+_taskThreeGameScore = 1000   ;TODO: change to 400, set to 4 for debuggin
+
+_taskOneGameWinSwf   = "/campaigns/careerDay2010/careerDay2010.swf"
+_taskTwoGameWinSwf   = "/campaigns/careerDay2010/careerDay2010.swf"
+_taskThreeGameWinSwf = "/campaigns/careerDay2010/careerDay2010.swf"
+
+_taskOneGameLoseSwf   = "/campaigns/careerDay2010/careerDay2010.swf"
+_taskTwoGameLoseSwf   = "/campaigns/careerDay2010/careerDay2010.swf"
+_taskThreeGameLoseSwf = "/campaigns/careerDay2010/careerDay2010.swf"
+
+_taskOneStatusMessage = "You want to be a Short-Track Driver."
+_taskTwoStatusMessage = "You're currently a Short-Track Driver. Take it up a notch!"
+_taskThreeStatusMessage = "You're currently a Formula Three Racer. Keep moving in the fast lane!"
+
+_taskOneRollOverCompletion = "Great job, Short-Track Driver! You finished the project and earned your own helmet."
+_taskTwoRollOverCompletion = "Great job, Formula Three Driver! You finished the project and earned your sponsored uniform."
+_taskThreeRollOverCompletion = ""

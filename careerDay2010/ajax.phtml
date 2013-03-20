@@ -1,0 +1,59 @@
+<?php
+/**
+ * @author  Ben Sgro
+ */
+
+/**
+ * Bootstrapping
+ */
+define('CD_PATH',      '/campaigns/careerDay2010/');
+define('CAREER_PATH',  'Career/');
+define('REP_PATH',     'representations/');
+
+include_once(ROOT . '/global.inc');
+include_once(ROOT . '/home/home_func.inc');
+include_once(ROOT . CD_PATH . 'careerDayXML.class.inc');
+include_once(ROOT . CD_PATH . 'careerDaySPI.class.inc');
+include_once(ROOT . CD_PATH . 'defines.inc');
+include_once(ROOT . CD_PATH . 'StateMachine/state.class.inc');
+
+/**
+ * MAIN
+ */
+
+if (!LOGGED_IN) { redirectToHome(); }
+
+$response = '__fail__';
+$act      = isset($_REQUEST['action']) ? $_REQUEST['action'] : null;
+
+switch ($act)
+{
+    case STATE_GET_JOBS:
+        $response = careerDayXML::getJobsRepresentation();
+    break;
+
+    case STATE_GET_JOB:
+        $response = careerDayXML::getJobRepresentation();
+    break;
+    
+    case STATE_START_TASK:
+        $response = careerDayXML::startTask();
+    break;
+    
+    case STATE_SUBMIT_TASK:
+        $response = careerDayXML::submitTask();
+    break;
+
+    case STATE_RESET_JOB:
+        $response = careerDayXML::resetJob();
+    break;
+
+    case STATE_TASK_ACTIVE:
+        $response = careerDayXML::activateTask();
+    break;
+}
+
+echo $response;
+
+_trace('FILE/EXEC END');
+?>

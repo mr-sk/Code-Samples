@@ -1,0 +1,319 @@
+<?php
+/**
+ * @author  Ben Sgro
+ */
+
+// Add a new career entry here:
+// ----------------------------   
+include_once(ROOT . CD_PATH . CAREER_PATH . 'career.class.inc');
+include_once(ROOT . CD_PATH . CAREER_PATH . 'policeCareer.class.inc');
+include_once(ROOT . CD_PATH . CAREER_PATH . 'baseballCareer.class.inc');
+include_once(ROOT . CD_PATH . CAREER_PATH . 'writerCareer.class.inc');
+include_once(ROOT . CD_PATH . CAREER_PATH . 'parkrangerCareer.class.inc');
+include_once(ROOT . CD_PATH . CAREER_PATH . 'astronautCareer.class.inc');
+include_once(ROOT . CD_PATH . CAREER_PATH . 'designerCareer.class.inc');
+include_once(ROOT . CD_PATH . CAREER_PATH . 'surferCareer.class.inc');
+include_once(ROOT . CD_PATH . CAREER_PATH . 'footballplayerCareer.class.inc');
+include_once(ROOT . CD_PATH . CAREER_PATH . 'racecardriverCareer.class.inc');
+
+/**
+ * @package careerDaySPI
+ */
+class careerDaySPI
+{
+    /**
+     * For the provided (URI params) job_id and task_id, we set the current task_id_active
+     * to 1 in the database for the job_id and user. This was created to be paired w/the
+     * API for the event when a selects 'start task' from the career center.
+     *
+     * @return  int TRUE on success, FALSE (< 0) error code on failure.
+     */
+    function activateTask()
+    {
+        $jobId = careerDaySPI::validateJobId();
+        if (!$jobId) return $jobId; // Remember, jobId is an error code in this case.
+        
+        $taskId = careerDaySPI::validateTaskId();
+        if (!$taskId) return $taskId; // ditto
+        
+        $sql = sprintf("UPDATE %s SET task_%s_active = 1 WHERE username = '%s' AND job_id = %s",
+                       CAREER_TABLE,
+                       $taskId,
+                       USERNAME,
+                       $jobId);
+        $res = db_query($sql);
+        return TRUE;
+    }
+    
+    /**
+     * Allows the reseting of a job. This is when the user completes a career and decides
+     * they want to do it again - we update all the tasks to be zero and set the time to
+     * now. This is instead of removing the row, because if we remove the row, the user
+     * could just keep doing the job over and over (since we have no record of it). So
+     * when a user says they are going to restart the job, they are automatically "enrolled"
+     * in the job - meaning we have a db entry and they are 'active' in the job.
+     * 
+     * You can only reset a job when you've completed it (ie: all tasks are complete)
+     *
+     * We also increment the task_count to track how many times the user has completed
+     * the job.
+     * 
+     * @return  boolean TRUE on success or an error code on FALSE.
+     */
+    function resetJob()
+    {
+        // Make sure the user who is logged in has the current job complete and
+        // if so, update it. Otherwise throw back an error.
+        $jobId = careerDaySPI::validateJobId();        
+        $sql   = sprintf("SELECT task_3 FROM %s WHERE username = '%s' AND job_id = %s AND task_1=1 "
+                       . " AND task_2=1 AND task_3=1",
+                         CAREER_TABLE,
+                         USERNAME,
+                         $jobId);
+
+        if (db_num_rows(db_query($sql)) == 1)
+        {
+            $sql = sprintf("UPDATE %s SET task_1 = 0, task_2 = 0, task_3 = 0, task_start = %s, "
+                         . " task_1_active = 1, task_2_active = 0, task_3_active = 0, task_count = task_count + 1"
+                         . " WHERE username = '%s' AND job_id = %s",
+                           CAREER_TABLE,
+                           NOW,
+                           USERNAME,
+                           $jobId);
+            db_query($sql);
+            return TRUE;
+        }
+        
+        return ERROR_UNABLE_TO_RESET;
+    }
+    
+    /**
+     * When the user interacts with a book (and possibly other items) they sometimes
+     * will be doing so to complete a task. In this case, the flash layer will want
+     * to make a request to the API, saying the user read a book. All they have to do
+     * is call the submit_task and pass in the book id (and possibly other's). We then
+     * attempt to validate the data, check if the user is active in the career and is
+     * able to complete a task today, then call the state machine.
+     *
+     * The state instance will take care of actually doing something about the book.
+     *
+     * NOTE:
+     * This might be a little too simple for now - meaning, if we add more books the
+     * logic will have to change. Right now its just one book per career.
+     *
+     * @return  mixed   A career object on success or varied error codes on failure.
+     */
+    function submitTask()
+    {
+        // Similiar to the hook code in @extension.inc, we need to make sure
+        // the currently logged in user is active in the career and is in the
+        // state where doing the provided task is meaningful.
+        $bookId   = careerDaySPI::validateBookId();
+        if (!$bookId) return $bookId;
+
+        $careerId = career::mapBookIdToCareer($bookId);
+        if (!$careerId) return ERROR_INVALID_BOOK_ID;
+        
+        // Create an instance of the career and attempt to load the logged
+        // in users' data in. Then we have to check and see if they are active
+        // in that career and haven't completed a task already today.
+        $careerString = career::mapCareerIdToClass($careerId);
+        include_once(ROOT . CD_PATH . CAREER_PATH . $careerString . '.class.inc');
+        include_once(ROOT . CD_PATH . 'StateMachine/stateMachine.class.inc');        
+
+        $career = new $careerString;
+        if ($career->isActiveForUser())
+        {
+            $career->updateStatusForLoggedInUser();
+            if (!$career->isTaskActiveForUser()) return ERROR_MIXED;
+            
+            $career->_stateMachine->update($career);            
+            // Because we are displaying this data back through the API, the career
+            // object might not be up to date from the data that's been updated
+            // into the database. So, we call this again to 'freshen-up' the
+            // object. heh - Specifically the _task<N>Complete property of the object.
+            // $career->updateStatusForLoggedInUser();
+            
+            // NOTE:
+            // No longer doing that, instead 'freshening' the object manually -
+            // calling updateStatusForLoggedInUser() was causing down stream issues
+            // BECAUSE, it casuses the state to exit, which in turn often calls the
+            // giveItem, giveMB, updateTask methods that are suppose to exit when
+            // we move from state to state - but this was a negative side-effect.
+            $taskCount = TransformXML::lcfirst(career::mapIntegerToTaskString($career->_stateMachine->getStateAsInteger()-1));        
+            $tComplete = sprintf('_%sComplete', $taskCount);            
+            $career->$tComplete = 1;
+            
+            return $career;
+        }
+        
+        return ERROR_MIXED; 
+    }
+    
+    /**
+     * Allows the user to start on the path to a career, by providing an entry
+     * in the database for that career route. Essentially enabling the first
+     * task - if there is no entry for a career (job_id) it means the user
+     * has not started that task/career. If we find an entry, it means they've
+     * started on that task/career - but haven't finished the first task.
+     *
+     * @return  mixed       A error code on error or an instance of a 'career'.
+     */
+    function startTask()
+    {                
+        $res = career::getTaskOneStatusAndTime();
+        if (empty($res))
+        {
+            // This case, the user hasn't started any tasks in any careers
+            // so its ok to go ahead and set them up for this task.
+            $career = careerDaySPI::setupCareerInstance();
+            $career->startTask();   
+            return $career;
+        }
+        
+        // Check any jobs that are in state 0, that means they have been created but
+        // no tasks have been accomplished. If they are in state 0 AND the start_time
+        // is anytime today, we can't let the user start another job. We limit them
+        // to starting one kob per day.
+        foreach($res as $cT)
+        {
+            if ( ($cT['task_1'] == 0) && (date('z-Y', $cT['task_start']) == date('z-Y')) )
+            {
+                return ERROR_JOB_STARTED;
+            }
+        }
+
+        $jobId = careerDaySPI::validateJobId();
+        // In this case the user may have any number of tasks going in careers. What
+        // we want to determine is if the desired job_id has the first task set or not.
+        // If we don't find an entry for the job_id, we know the career/task has not
+        // be started yet.
+        foreach($res as $cT)
+        {
+            if ( ($cT['task_1'] == 1 || $cT['task_1'] == 0) && $cT['job_id'] == $jobId)
+            {
+                return ERROR_TASK_STARTED;
+            }
+        }
+
+        // We didn't find the job, so its ok to start one.
+        $career = careerDaySPI::setupCareerInstance();
+        $career->startTask();   
+        return $career;
+    }
+    
+    /**
+     * Creates an instance of each career and returns an array of all the careers.
+     *
+     * NOTE: Add to this if you create a new career
+     */
+    function getJobsList()
+    {
+        // Add a new career entry here:
+        // ----------------------------
+        
+        $policeObj = new policeCareer();
+        $policeObj->updateStatusForLoggedInUser();
+        
+        $baseballObj = new baseballCareer();
+        $baseballObj->updateStatusForLoggedInUser();
+        
+        $writerObj = new writerCareer();
+        $writerObj->updateStatusForLoggedInUser();
+        
+        $rangerObj = new parkrangerCareer();
+        $rangerObj->updateStatusForLoggedInUser();
+        
+        $astroObj = new astronautCareer();
+        $astroObj->updateStatusForLoggedInUser();
+
+        $designerObj = new designerCareer();
+        $designerObj->updateStatusForLoggedInUser();
+		
+		$surferObj = new surferCareer();
+        $surferObj->updateStatusForLoggedInUser();
+		
+		$footballplayerObj = new footballplayerCareer();
+        $footballplayerObj->updateStatusForLoggedInUser();
+		
+		$racecardriverObj = new racecardriverCareer();
+        $racecardriverObj->updateStatusForLoggedInUser();
+		
+        return $careerSet = array($policeObj,
+                                  $baseballObj,
+                                  $writerObj,
+                                  $rangerObj,
+                                  $astroObj,
+                                  $designerObj,
+								  $surferObj,
+								  $footballplayerObj,
+								  $racecardriverObj);
+    }
+    
+    /**
+     * Generates an array that holds the job data and all the tasks associated with it
+     * along with the users' state for each task.
+     *
+     * @return  object  A career object.
+     */
+    function getJobList()
+    {
+        return careerDaySPI::setupCareerInstance();
+    }
+
+    /**
+     * Typical career bootstrapping encapsulated in this method.
+     *
+     * @return  mixed   A career object, or error code.
+     */
+    function setupCareerInstance()
+    {
+        $jobId = careerDaySPI::validateJobId();
+        if (!$jobId) return $jobId;
+
+        $className = career::mapCareerIdToClass($jobId);
+        $career = new $className;
+        $career->updateStatusForLoggedInUser();
+        
+        return $career;
+    }
+    
+    /**
+     * Extract the task_id URI param and check aginst some rules.
+     *
+     * @return  int The task id or an error code.
+     */
+    function validateTaskId()
+    {
+        $taskId = (int) isset($_REQUEST['task_id']) ? $_REQUEST['task_id'] : null;
+        if ($taskId <= 0 || $taskId > TASK_ID_RANGE) { return ERROR_INVALID_TASL_ID; }
+        return $taskId;
+    }
+    
+    /**
+     * Extract the job ID from the URI params and check it against some rules
+     * 
+     * @return  int   The job id or an error code.
+     */
+    function validateJobId()
+    {
+        $jobId = (int) isset($_REQUEST['job_id']) ? $_REQUEST['job_id'] : null;
+        if ($jobId <= 0 || $jobId > JOB_ID_RANGE) { return ERROR_INVALID_JOB_ID; }
+        return $jobId;
+    }
+
+    /**
+     * Extract the book id from the URI params and compared against an array of
+     * valid book ids.
+     *
+     * @return  int The book id or an error code.
+     */
+    function validateBookId()
+    {
+        global $VALID_BOOK_IDS;
+        
+        $bookId = (int) isset($_REQUEST['book_id'])? $_REQUEST['book_id'] : null;
+        if (!in_array($bookId, $VALID_BOOK_IDS)) { return ERROR_INVALID_BOOK_ID; }
+        return $bookId;
+    }
+}

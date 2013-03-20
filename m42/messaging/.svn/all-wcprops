@@ -1,0 +1,29 @@
+K 25
+svn:wc:ra_dav:version-url
+V 52
+/!svn/ver/335/project/M42/engine/trunk/src/messaging
+END
+m42MessageDispatcher.h
+K 25
+svn:wc:ra_dav:version-url
+V 75
+/!svn/ver/335/project/M42/engine/trunk/src/messaging/m42MessageDispatcher.h
+END
+m42MessageDispatcher.mm
+K 25
+svn:wc:ra_dav:version-url
+V 76
+/!svn/ver/335/project/M42/engine/trunk/src/messaging/m42MessageDispatcher.mm
+END
+m42Telegram.h
+K 25
+svn:wc:ra_dav:version-url
+V 66
+/!svn/ver/335/project/M42/engine/trunk/src/messaging/m42Telegram.h
+END
+m42TelegramStruct.h
+K 25
+svn:wc:ra_dav:version-url
+V 72
+/!svn/ver/335/project/M42/engine/trunk/src/messaging/m42TelegramStruct.h
+END

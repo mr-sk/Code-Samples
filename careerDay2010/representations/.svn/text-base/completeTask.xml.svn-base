@@ -1,0 +1,8 @@
+<root hasWon="1" isGame="%s">
+  <date>%s</date>
+  <username>%s</username>
+  <awardmillsbucks>%s</awardmillsbucks>
+  <awardeditem name="%s">
+        <loaderXml><![CDATA[%s]]></loaderXml>
+  </awardeditem>
+</root>

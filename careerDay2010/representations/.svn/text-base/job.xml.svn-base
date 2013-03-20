@@ -1,0 +1,8 @@
+
+    <job id="%s" title="%s" available="%s" canbestarted="%s" canbefinished="%s" taskvalidtoday="%s" hasbeenstarted="%s">
+        <jobicon>%s</jobicon>
+        <description><![CDATA[%s]]></description>
+        <status>%s</status>
+        <taskTitle>%s</taskTitle>
+        <awardedItem>%s</awardedItem>%s
+    </job>

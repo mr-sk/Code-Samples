@@ -1,0 +1,8 @@
+            <task id="%s" title="%s" state="%s">
+                    <description><![CDATA[%s]]></description>
+                    <awarditem name="%s">%s</awarditem>
+                    <awardmillsbucks>%s</awardmillsbucks>
+                    <target type="%s" url="%s" gameid="%s"/>
+                    <statusmessage><![CDATA[%s]]></statusmessage>
+                    <rollovercompletion><![CDATA[%s]]></rollovercompletion>                    
+            </task>

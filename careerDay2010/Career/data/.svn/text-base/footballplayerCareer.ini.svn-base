@@ -1,0 +1,72 @@
+; @copyright Copyright (c) 2010 Elephant Ventures, LLC.
+; @author Ben Sgro <ben@elephantventures.com
+
+; Used to turn the career on/off
+_available  = 1
+
+_id          = 8
+_image       = "footballplayer.swf"
+_title       = "Football Player"
+_description = "Got persistence and passion? Football players do! Plus, they watch old games, understand plays, strategies, good teamwork, and have incredible mental and physical strength."
+
+_taskOne   =
+_taskTwo   =
+_taskThree = 
+
+_taskOneMessage   = "Completed task one!"
+_taskTwoMessage   = "Completed task two!"
+_taskThreeMessage = "Completed task three!"
+    
+_taskOneDescription   = "Earn at least 200 points during any one game of Tricky Touchdown, and then submit your score."
+_taskTwoDescription   = "All athletes need to maintain a good diet. Start your day right by buying a breakfast item."
+_taskThreeDescription = "Earn at least 400 points during any one game of Tricky Touchdown, and then submit your score!"
+
+_taskOneAwardItemId   = 18557
+_taskTwoAwardItemId   = 18558
+_taskThreeAwardItemId = 18559
+        
+_taskOneAwardItem   = "item1.swf"
+_taskTwoAwardItem   = "item2.swf"
+_taskThreeAwardItem = "item3.swf"
+
+_taskOneAwardCheck   = 100
+_taskTwoAwardCheck   = 200
+_taskThreeAwardCheck = 300
+
+_taskOneAwardTitle   = "Rookie"
+_taskTwoAwardTitle   = "Starter"
+_taskThreeAwardTitle = "All-Pro"
+
+_taskCompleteMessage = "Great Job!"  
+
+_taskOneGameId   = 484
+_taskTwoGameId   = 
+_taskThreeGameId = 484
+
+_taskOneTargetType   = "game"
+_taskTwoTargetType   = "location"
+_taskThreeTargetType = "game"
+
+_taskOneTargetURL   = ""
+_taskTwoTargetURL   = "/shop.phtml?shop_id=4"
+_taskThreeTargetURL = ""
+
+_taskOneGameScore   = 200    ;TODO: change to 200, set to 2 for debuggin
+_taskTwoGameScore   =      ;TODO: change to 300, set to 3 for debuggin
+_taskThreeGameScore = 400     ;TODO: change to 400, set to 4 for debuggin
+
+_taskOneGameWinSwf   = "/campaigns/careerDay2010/careerDay2010.swf"
+_taskTwoGameWinSwf   = "/campaigns/careerDay2010/careerDay2010.swf"
+_taskThreeGameWinSwf = "/campaigns/careerDay2010/careerDay2010.swf"
+
+_taskOneGameLoseSwf   = "/campaigns/careerDay2010/careerDay2010.swf"
+_taskTwoGameLoseSwf   = "/campaigns/careerDay2010/careerDay2010.swf"
+_taskThreeGameLoseSwf = "/campaigns/careerDay2010/careerDay2010.swf"
+
+_taskOneStatusMessage = "You want to be a Rookie."
+_taskTwoStatusMessage = "You're currently a Rookie! Keep practicing and you'll be an All-Pro."
+_taskThreeStatusMessage = "You're currently a Starter. Wanna be an All-Pro?"
+
+_taskOneRollOverCompletion = "Great job, Rookie! You finished the project and earned a football uniform."
+_taskTwoRollOverCompletion = "Great job, Starter! You finished the project and earned a goal post."
+_taskThreeRollOverCompletion = ""

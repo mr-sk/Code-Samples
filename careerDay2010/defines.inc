@@ -1,0 +1,204 @@
+<?php
+/**
+ * @author Ben Sgro
+ */
+
+// The database table to store the task data
+define('CAREER_TABLE', 'CAMPAIGN_DATA_CAREERDAY2010');
+
+// Add a new career entry here:
+// ----------------------------
+
+// A mapping of the ID to the Career
+define('ID_POLICE',    1);
+define('ID_BASEBALL',  2);
+define('ID_WRITER',    3);
+define('ID_RANGER',    4);
+define('ID_ASTRONAUT', 5);
+define('ID_DESIGNER',  6);
+define('ID_SURFER',    7);
+define('ID_FOOTBALL',  8);
+define('ID_CARDRIVER', 9);
+
+// Upper limit on the number of valid jobs we have
+define('JOB_ID_RANGE', 9);
+
+// Upper limit on the number of valid tasks we have
+define('TASK_ID_RANGE',3);
+
+// Error codes
+define('ERROR_INVALID_JOB_ID', -1);
+define('ERROR_TASK_STARTED',   -2);
+define('ERROR_TASK_TIME',      -3);
+define('ERROR_INVALID_BOOK_ID',-4);
+define('ERROR_MIXED',          -5);
+define('ERROR_JOB_STARTED',    -6);
+define('ERROR_UNABLE_TO_RESET',-7);
+define('ERROR_INVALID_TASK_ID',-8);
+
+// Provides a list of jobs for the career center.
+define('STATE_GET_JOBS', 'get_jobs');
+// List all the tasks and the user's status for a specific job id
+define('STATE_GET_JOB',  'get_job');
+// Start on a career track by selecting the first task
+define('STATE_START_TASK', 'start_task');
+// User finishes a book (or possibly other action) and flash layer makes
+// a request to the API to let us know that happened.
+define('STATE_SUBMIT_TASK', 'submit_task');
+// Allows the user to reset a job and start over - this is only available if they've
+// completed all the tasks for the job.
+define('STATE_RESET_JOB',   'reset_job');
+// When the user selects 'Start Task' from the Career Center a
+// request will let the system know that task is now valid for the user
+define('STATE_TASK_ACTIVE', 'task_active');
+
+// Game Ids
+define('GAME_MOST_WANTED',  'g16_v16');
+define('GAME_ROPE_RACE',    'g100_v16');
+define('GAME_HOME_RUN',     'g160_v8');
+define('GAME_WORD_MATCH',   'g12_v9');
+define('GAME_PARK_CLEANUP', 'g19_v12');
+define('GAME_COUNTDOWN',    'g80_v32');
+define('GAME_RACE_CAR',     '510');
+define('GAME_FOOTBALL',     '484');
+define('GAME_KAI_SURF',     '486');
+
+// Book Ids
+// NOTE:
+// If you add to this list, also update @see career::mapBookIdToCareer($bookId)
+//      Also update the @see careerDay2010/bookExtension.inc switch statement
+define('BOOK_LOUGEHRIG', 5912);
+define('BOOK_ZORA',      9138);
+define('BOOK_EARTHDAY',  11276);
+define('BOOK_EARTHDAY2', 11256);
+define('BOOK_XPRIZE',    7150);
+$VALID_BOOK_IDS = array(5912, // Sports Legends, Then and Now: Lou Gehrig
+                        9138, // Writer's Life: Zora Nearle Hurston
+                        11276, // A history of earth day
+                               //
+                               // TODO: Remove this v--- entry
+                        11256,  // A history of earth day (on local?)
+                        7150   // The X Prize
+                        );
+
+// Item Ids
+define('CLOTHING_ASTRONAUT_SUIT', 3247);
+
+// Item Ids
+// Surfer:
+// 7657
+// 7214 to 7229
+define('CLOTHING_SURFER_7657', 7657);
+define('CLOTHING_SURFER_7214', 7214);
+define('CLOTHING_SURFER_7215', 7215);
+define('CLOTHING_SURFER_7216', 7216);
+define('CLOTHING_SURFER_7217', 7217);
+define('CLOTHING_SURFER_7218', 7218);
+define('CLOTHING_SURFER_7219', 7219);
+define('CLOTHING_SURFER_7220', 7220);
+define('CLOTHING_SURFER_7221', 7221);
+define('CLOTHING_SURFER_7222', 7222);
+define('CLOTHING_SURFER_7223', 7223);
+define('CLOTHING_SURFER_7224', 7224);
+define('CLOTHING_SURFER_7225', 7225);
+define('CLOTHING_SURFER_7226', 7226);
+define('CLOTHING_SURFER_7227', 7227);
+define('CLOTHING_SURFER_7228', 7228);
+define('CLOTHING_SURFER_7229', 7229);
+define('CLOTHING_SURFER_18552', 18552);
+define('CLOTHING_SURFER_7651', 7651);
+define('CLOTHING_SURFER_7161', 7161);
+define('CLOTHING_SURFER_7160', 7160);
+define('CLOTHING_SURFER_7159', 7159);
+define('CLOTHING_SURFER_7158', 7158);
+define('CLOTHING_SURFER_7153', 7153);
+
+// Racecar Driver:
+//13856
+define('CLOTHING_RACECAR_DRIVER', 13856);
+
+// Football player:
+/* 14441
+    14440
+    14431
+    14430
+    14429
+    14428
+    14426
+    14423
+    14422
+    14420
+    14419
+    14418
+    6030
+    6029
+    6028
+    6027
+    6009
+    4809
+    1785
+    354
+    352
+    348
+    342
+*/
+define('FOOD_FOOTBALL_PLAYER_14441', 14441);
+define('FOOD_FOOTBALL_PLAYER_14440', 14440);
+define('FOOD_FOOTBALL_PLAYER_14431', 14431);
+define('FOOD_FOOTBALL_PLAYER_14429', 14429);
+define('FOOD_FOOTBALL_PLAYER_18720', 18720);
+define('FOOD_FOOTBALL_PLAYER_14423', 14423);
+define('FOOD_FOOTBALL_PLAYER_14422', 14422);
+define('FOOD_FOOTBALL_PLAYER_14420', 14420);
+define('FOOD_FOOTBALL_PLAYER_14419', 14419);
+define('FOOD_FOOTBALL_PLAYER_14418', 14418);
+define('FOOD_FOOTBALL_PLAYER_6030',  6030);
+define('FOOD_FOOTBALL_PLAYER_6029',  6029);
+define('FOOD_FOOTBALL_PLAYER_6028',  6028);
+define('FOOD_FOOTBALL_PLAYER_6027',  6027);
+define('FOOD_FOOTBALL_PLAYER_6009',  6009);
+define('FOOD_FOOTBALL_PLAYER_4809',  4809);
+define('FOOD_FOOTBALL_PLAYER_1785',  1785);
+define('FOOD_FOOTBALL_PLAYER_354',   354);
+define('FOOD_FOOTBALL_PLAYER_352',   352);
+define('FOOD_FOOTBALL_PLAYER_348',   348);
+define('FOOD_FOOTBALL_PLAYER_342',   342);   
+
+// Shirt Types
+define('SHIRT_TANK_TOP',    1);
+define('SHIRT_BUTTON_DOWN', 2);
+define('SHIRT_DESIGNER',    3);
+
+/**
+ *
+ * Aux functions.
+ *
+ */
+function _trace($msg = '')
+{
+    if (PRODUCTION_SERVER) return 0;
+
+    $tmpSet = debug_backtrace();
+    $i=0; if (count($tmpSet) != 1) ++$i;
+    
+    $str = date('U') . '[x]f(): ' . $tmpSet[$i]['function'] . " [x]argv: $msg";
+
+    /** You'll need this setup in your php.ini:
+     * 
+     *      error_log = C:\tmp\phplog\phperrors-log.txt
+     *      
+     *  Or your own path/file, and the directory must exist and be writable.
+     */
+    error_log($str);
+}
+
+function _getTraceForLog()
+{
+    if (PRODUCTION_SERVER) return 0;
+    
+    $tmpSet = debug_backtrace();
+    $i=0; if (count($tmpSet) != 1) $i+=2;
+    
+    $str = @sprintf("%s:%s:%s", $tmpSet[$i]['class'],$tmpSet[$i]['function'],$tmpSet[--$i]['line']);
+    return $str;
+}

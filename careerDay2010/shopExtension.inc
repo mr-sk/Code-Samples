@@ -1,0 +1,100 @@
+<?php
+/**
+ * @author Ben Sgro
+ */
+define('CD_PATH',      '/campaigns/careerDay2010/');
+define('CAREER_PATH',  'Career/');
+define('REP_PATH',     ROOT . CD_PATH . 'representations/');
+
+include_once(ROOT . '/global.inc');
+include_once(ROOT . '/home/home_func.inc');
+include_once(ROOT . CD_PATH . 'careerDayXML.class.inc');
+include_once(ROOT . CD_PATH . 'careerDaySPI.class.inc');
+include_once(ROOT . CD_PATH . 'TransformXML.class.inc');
+include_once(ROOT . CD_PATH . 'defines.inc');
+include_once(ROOT . CD_PATH . CAREER_PATH . 'career.class.inc');
+
+function handleShopItem($jobId)
+{
+    _trace('handleGame for jobId:' . $jobId);
+    $careerString = career::mapCareerIdToClass($jobId);
+    include_once(ROOT . CD_PATH . 'StateMachine/stateMachine.class.inc');
+    include_once(ROOT . CD_PATH . CAREER_PATH . $careerString . '.class.inc');
+    
+    $career = new $careerString;
+    if ($career->isActiveForUser())
+    {
+        $career->updateStatusForLoggedInUser();
+        if (!$career->isTaskActiveForUser()) return FALSE;
+        
+        $career->_stateMachine->update($career);
+    }      
+}
+
+_trace('shop-hook system starting');
+
+global $gFlashArgs;
+global $item_id;
+
+_trace("item_id($item_id)");
+if ('' == $item_id) return;
+
+switch ($item_id)
+{
+    case CLOTHING_SURFER_7214:
+    case CLOTHING_SURFER_7215:
+    case CLOTHING_SURFER_7216:
+    case CLOTHING_SURFER_7217:
+    case CLOTHING_SURFER_7218:
+    case CLOTHING_SURFER_7219:
+    case CLOTHING_SURFER_7220:
+    case CLOTHING_SURFER_7221:
+    case CLOTHING_SURFER_7222:
+    case CLOTHING_SURFER_7223:
+    case CLOTHING_SURFER_7224:
+    case CLOTHING_SURFER_7225:
+    case CLOTHING_SURFER_7226:
+    case CLOTHING_SURFER_7227:
+    case CLOTHING_SURFER_7228:
+    case CLOTHING_SURFER_7229:
+    case CLOTHING_SURFER_18552:
+    case CLOTHING_SURFER_7651:
+    case CLOTHING_SURFER_7161:
+    case CLOTHING_SURFER_7160:
+    case CLOTHING_SURFER_7159:
+    case CLOTHING_SURFER_7158:
+    case CLOTHING_SURFER_7153:
+        handleShopItem(ID_SURFER);
+    break;
+
+    case FOOD_FOOTBALL_PLAYER_14418:
+    case FOOD_FOOTBALL_PLAYER_14419:
+    case FOOD_FOOTBALL_PLAYER_14420:
+    case FOOD_FOOTBALL_PLAYER_14422:
+    case FOOD_FOOTBALL_PLAYER_14423:
+    case FOOD_FOOTBALL_PLAYER_14429:
+    case FOOD_FOOTBALL_PLAYER_14431:
+    case FOOD_FOOTBALL_PLAYER_14441:
+    case FOOD_FOOTBALL_PLAYER_14440:
+    case FOOD_FOOTBALL_PLAYER_18720:
+    case FOOD_FOOTBALL_PLAYER_6030:
+    case FOOD_FOOTBALL_PLAYER_6029:
+    case FOOD_FOOTBALL_PLAYER_6028:
+    case FOOD_FOOTBALL_PLAYER_6027:
+    case FOOD_FOOTBALL_PLAYER_6009:
+    case FOOD_FOOTBALL_PLAYER_4809:
+    case FOOD_FOOTBALL_PLAYER_1785:
+    case FOOD_FOOTBALL_PLAYER_354:
+    case FOOD_FOOTBALL_PLAYER_352:
+    case FOOD_FOOTBALL_PLAYER_348:
+    case FOOD_FOOTBALL_PLAYER_342:       
+        handleShopItem(ID_FOOTBALL);
+    break;
+    
+    case CLOTHING_RACECAR_DRIVER:
+        handleShopItem(ID_CARDRIVER);
+    break;
+}
+
+_trace("gFlashArgs = $gFlashArgs");
+_trace('shop-hook system ending');
