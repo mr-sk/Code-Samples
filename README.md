@@ -3,8 +3,6 @@ Code-Samples
 
 Assorted Code Samples (2007 - Present)
 
-* 
-
 * careerDay2010 (2010; PHP, HTML, Javascript, SQL)
   This is a PHP 4.x (legacy system) implementation of a state machine, along with
   a web API for updating "objects" that are modeled in the DB. No framework in use. 
